@@ -199,19 +199,24 @@ class BunyanJsonFormatter(JsonFormatter):
         """
         #Add hostname
         log_record['hostname'] = socket.gethostname()
-        log_record['level'] = log_record['levelno'] + 10
-        log_record['created_at'] = log_record['time'] = log_record['created']
+
+        if 'levelno' in log_record:
+            log_record['level'] = log_record['levelno'] + 10
+
+        if 'created' in log_record:
+            log_record['created_at'] = log_record['time'] = log_record['created']
+            del log_record['created']
+
+        if 'process' in log_record:
+            log_record['pid'] = log_record['process']
+            del log_record['process']
 
         if 'message' in log_record and log_record['message']:
             log_record['msg'] = log_record['message']
+            del log_record['message']
         else:
             log_record['msg'] = ""
 
-        log_record['pid'] = log_record['process']
         log_record['v'] = 0
-
-        del log_record['message']
-        del log_record['process']
-        del log_record['created']
 
         return log_record
